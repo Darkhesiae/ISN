@@ -94,7 +94,7 @@ void startGame() {
 void gameOver() {
   gameScreen=2;
 }
-
+ez
 void restart() {
   score = 0;
 
