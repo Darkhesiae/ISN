@@ -13,6 +13,8 @@ int curseurX, curseurY;
 int curseurVitesse = 40;
 float lastInput = 0;
 
+String mode = "clavier";
+
 //Définition des tableaux
 ArrayList<int[]> walls = new ArrayList<int[]>();
 ArrayList<int[]> numbers = new ArrayList<int[]>();
@@ -53,6 +55,7 @@ void gameScreen() {
   wallAdder();
   wallHandler();
   drawCurseur();
+  
 }
 
 //Définition de l'écran de Game Over
@@ -71,11 +74,17 @@ void gameOverScreen() {
 public void mousePressed() { 
   if (gameScreen==0) { 
     startGame();
+    curseurY =  height/2;
+    mode = "souris";
+    
   }
   if (gameScreen==2) {
     restart();
+    mode = "souris";
+    curseurY =  height/2;
   }
 }
+
 
 //Définition des fonctions de changement d'écran
 void startGame() {
@@ -96,10 +105,25 @@ void restart() {
 
 //Défintion de la fonction de déplacement du curseur
 void mouseMoved(){
+  if (mode == "souris") {
   curseurX = mouseX;
-  curseurY = mouseY;
+  curseurY = mouseY;}
+  else if (mode == "clavier") {}
 }
-void keyPressed() {
+
+public void keyPressed(){
+    if (keyCode == ENTER){
+          if (gameScreen==0) { 
+            startGame();
+            mode = "clavier";
+          curseurY =  height/2;}
+          else if (gameScreen==2) {
+            restart();
+            mode = "clavier";
+          curseurY =  height/2;}
+            
+      }
+  if (mode == "clavier") {
    if (lastInput > 300){
       if (keyCode == DOWN){
          curseurY += curseurVitesse;
@@ -114,6 +138,7 @@ void keyPressed() {
          curseurX += curseurVitesse;
          lastInput = 0;}
    }
+ else if (mode == "souris") {}}
 }
 //Définition de la fonction d'affichage du curseur
 void drawCurseur() {
@@ -236,4 +261,3 @@ void keepInScreen() {
     curseurX = (curseurSize/2);
   }
 }
-fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
