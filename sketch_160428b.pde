@@ -236,4 +236,4 @@ void keepInScreen() {
     curseurX = (curseurSize/2);
   }
 }
-fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+
