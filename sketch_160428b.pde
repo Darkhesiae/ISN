@@ -1,19 +1,20 @@
-//Définition des variables
+//Défintion des variables de contrôle
+int gameScreen = 0;
+int score = 0;
+float lastInput = 0;
+String mode = "clavier";
+//Définition des variables des murs
 int minGapHeight = 100;
 int maxGapHeight = 200;
 int wallsWidth = 80;
 float wallSpeed = 2;
 float lastAddTime = 0;
 int wallsInterval = 6000;
-int gameScreen = 0;
-int score = 0;
+//Définition des variables
 color curseurColor = color(0);
 int curseurSize = 40;
 int curseurX, curseurY;
 int curseurVitesse = 40;
-float lastInput = 0;
-
-String mode = "clavier";
 
 //Définition des tableaux
 ArrayList<int[]> walls = new ArrayList<int[]>();
@@ -48,14 +49,13 @@ void initScreen() {
   text("Click to Math", width/2, height-30);
 }
 
-//Définition de l'écran de jeu
+//Définition de l'écran de jeu et emploi des fonctions définies plus bas
 void gameScreen() {
   background(236, 240, 241);
   lastInput += 50; 
   wallAdder();
   wallHandler();
   drawCurseur();
-  
 }
 
 //Définition de l'écran de Game Over
@@ -110,7 +110,7 @@ void mouseMoved(){
   curseurY = mouseY;}
   else if (mode == "clavier") {}
 }
-
+//Définition du choix de contrôle au clavier
 public void keyPressed(){
     if (keyCode == ENTER){
           if (gameScreen==0) { 
@@ -123,6 +123,7 @@ public void keyPressed(){
           curseurY =  height/2;}
             
       }
+//Définition des contrôles au clavier 
   if (mode == "clavier") {
    if (lastInput > 300){
       if (keyCode == DOWN){
