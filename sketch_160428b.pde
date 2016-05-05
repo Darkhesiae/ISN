@@ -3,6 +3,7 @@ int gameScreen = 0;
 int score = 0;
 float lastInput = 0;
 String mode = "Init";
+int place = 1;
 //Définition des variables des murs
 int minGapHeight = 100;
 int maxGapHeight = 200;
@@ -197,37 +198,56 @@ void numberAdder() {
       int randY = round(random(0, height));
       int scoreN = round(random(0, 25));
       float R = random(150);
-  float G = random (150);
-  float B = random (150);
-  color numberColors = color(R, G, B);
-      int[] number = {width, randY, scoreN, 0, numberColors}; 
-      numbers.add(number);
-      lastNumber = millis();
-     
-    }
-}
-void numberHandler() {
-  for (int i = 0; i < numbers.size(); i++) {
-    numberMover(i);
-    numberDrawer(i);
-    numberVariable();
-    cirlceDrawer(i);
-  }
+      float G = random (150);
+      float B = random (150);
+      color numberColors = color(R, G, B);
+        int[] number = {width, randY, scoreN, 40, numberColors}; 
+        numbers.add(number);
+        lastNumber = millis();}
 }
 
 //Définition de la fonction d'affichage des numeros
+ 
+void keepNumberInScreen(int index) {
+    
+    int[] numberS = numbers.get(index);
+    int nbY = numberS[1];
+    int nbT = numberS[3];
+    float R = (255);
+    float G = (0);
+    float B = (127);
+    color dcolor = color(R, G, B);
+    if ((nbY+ nbT) > height) { 
+      place = 0;
+      numberS[1] = height-50;
+      numberS[4] = dcolor;
+      }
+    else {
+      place = 1;
+      }
+    if ((nbY - nbT) < 0) {
+      place = 0;
+      numberS[1] =+ 50; 
+      numberS[4] = dcolor;
+      
+      }
+    else  {
+    place = 1;}
+  
+}
 void numberDrawer(int index) {
-  int[] number = numbers.get(index);
-  // get gap wall settings 
-  int NumberX = number[0];
-  int NumberY = number[1];
-  int colors = number[4];
-  smooth();
-  fill(colors);
-  ellipse(NumberX, NumberY, curseurSize, curseurSize);
-
-
-
+  
+    int[] number = numbers.get(index);
+    // get gap wall settings 
+    int NumberX = number[0];
+    int NumberY = number[1];
+    int colors = number[4];
+     if (place == 1){
+      smooth();
+      noStroke();
+      fill(colors);
+      ellipseMode(CENTER);
+      ellipse(NumberX, NumberY, curseurSize, curseurSize);}
 }
 
 
@@ -241,7 +261,7 @@ void cirlceDrawer(int index) {
   int Height = number[3];
   textAlign(CENTER);
   textSize(25);
-  text(Width, NumberX, NumberY,  Height) ;
+  text(Width, NumberX, NumberY+4,  Height) ;
 }
 //Définition de la fonction de déplacement des numéros (Same as wall)
 void numberMover(int index) {
@@ -253,7 +273,7 @@ void numberMover(int index) {
 void numberVariable() {
     if ((wallSpeed < 5) &&
     (wallsInterval > 3000)) {
-    numbersInterval = round(random(1000, 20000));
+    numbersInterval = round(random(1000, 3000));
     wallSpeed += 0.000025;
     println(wallSpeed, wallsInterval);
   } else {
@@ -266,12 +286,19 @@ void numberVariable() {
     wallsInterval -= 0.0025;
   }
   if (wallsInterval < 3000) {
-    wallsInterval -= 0.0000025;
-
-    
-}
+    wallsInterval -= 0.0000025;}
 }
 
+
+void numberHandler() {
+  for (int i = 0; i < numbers.size(); i++) {
+    numberMover(i);
+    numberDrawer(i);
+    numberVariable();
+    cirlceDrawer(i);
+    keepNumberInScreen(i);
+  }
+}
 //Définition de la fonction de contrôle des murs
 void wallHandler() {
   for (int i = 0; i < walls.size(); i++) {
@@ -279,7 +306,7 @@ void wallHandler() {
     wallDrawer(i);
     watchWallCollision(i);
     numberVariable();
-    keepNumberInScreen(i);
+
   }
 }
 
@@ -386,20 +413,3 @@ void keepInScreen() {
   }
 }
 
-void keepNumberInScreen(int index) {
-  int[] numberS = numbers.get(index);
-  int nbY = numberS[1];
-  int nbT = numberS[3];
-  
-  if (nbY+(nbT * 2) > height) { 
-    numberS[1] = height-80;
-
-  }
-  // curseur hits ceiling
-  if (nbY < 0) {
-    numberS[1] =+ 80;
-  }
-  // curseur hits left of the screen
-
-
-}
