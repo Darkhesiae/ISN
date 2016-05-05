@@ -8,7 +8,7 @@ int place = 1;
 int minGapHeight = 100;
 int maxGapHeight = 200;
 int wallsWidth = 80;
-float wallSpeed = 2;
+float wallSpeed = 2.0000;
 float lastAddTime = 0;
 float wallsInterval = 6000;
 float lastNumber =0;
@@ -62,6 +62,26 @@ void gameScreen() {
   numberAdder();
   numberHandler();
   keepInScreen();
+  numberCollision();
+}
+
+void numberVariable() {
+    if ((wallSpeed < 5) &&
+    (wallsInterval > 3000)) {
+    numbersInterval = round(random(1000, 3000));
+    wallSpeed += 0.000025;
+    println(wallSpeed, wallsInterval);
+  } else {
+    numbersInterval = round(random(3000, 30000));
+    wallSpeed = 5;
+    println(wallSpeed, wallsInterval);
+    wallsInterval = round(random(2000, 20000));
+  }
+  if (wallsInterval > 3000) {
+    wallsInterval -= 0.0025;
+  }
+  if (wallsInterval < 3000) {
+    wallsInterval -= 0.0000025;}
 }
 
 //Définition de l'écran de Game Over
@@ -235,6 +255,8 @@ void keepNumberInScreen(int index) {
     place = 1;}
   
 }
+
+
 void numberDrawer(int index) {
   
     int[] number = numbers.get(index);
@@ -270,24 +292,6 @@ void numberMover(int index) {
 }
 
 //Définition de la fonction de variation des vitesses et intervalles d'apparition des murs
-void numberVariable() {
-    if ((wallSpeed < 5) &&
-    (wallsInterval > 3000)) {
-    numbersInterval = round(random(1000, 3000));
-    wallSpeed += 0.000025;
-    println(wallSpeed, wallsInterval);
-  } else {
-    numbersInterval = round(random(3000, 30000));
-    wallSpeed = 5;
-    println(wallSpeed, wallsInterval);
-    wallsInterval = round(random(2000, 20000));
-  }
-  if (wallsInterval > 3000) {
-    wallsInterval -= 0.0025;
-  }
-  if (wallsInterval < 3000) {
-    wallsInterval -= 0.0000025;}
-}
 
 
 void numberHandler() {
@@ -297,7 +301,14 @@ void numberHandler() {
     numberVariable();
     cirlceDrawer(i);
     keepNumberInScreen(i);
+
   }
+}
+void numberCollision() {
+  for (int i1 = 0; i1 < numbers.size(); i1++) {
+    for (int i2 = 0; i2 < walls.size(); i2++) {
+    watchNumberCollision(i2, i1);}}
+  
 }
 //Définition de la fonction de contrôle des murs
 void wallHandler() {
@@ -306,7 +317,7 @@ void wallHandler() {
     wallDrawer(i);
     watchWallCollision(i);
     numberVariable();
-
+     
   }
 }
 
@@ -336,13 +347,81 @@ void wallMover(int index) {
 
 
 //Définition de la fonction de détection de collisions entre le curseur et les murs
-void watchWallCollision(int index) {
-  int[] wall = walls.get(index);
-  int[] numberC = numbers.get(index);
+
+void keepInScreen() {
+
+  if (curseurY+(curseurSize/2) > height) { 
+    curseurY = height-(curseurSize/2);
+  }
+  // curseur hits ceiling
+  if (curseurY-(curseurSize/2) < 0) {
+    curseurY = (curseurSize/2);
+  }
+  // curseur hits left of the screen
+  if (curseurX-(curseurSize/2) < 0) {
+     curseurX = (curseurSize/2);
+  }
+  // curseur hits right of the screen
+  if (curseurX+(curseurSize/2) > width) {
+     curseurX = width-(curseurSize/2);
+  }
+}
+void watchNumberCollision(int index1, int index2) {
+  int[] walle = walls.get(index1);
+  int[] numberC = numbers.get(index2);
   // get gap wall settings 
   int nbX =  numberC[0];
   int nbY = numberC[1];
   int nbT = numberC[3];
+  int gapWallX = walle[0];
+  int gapWallY = walle[1];
+  int gapWallWidth = walle[2];
+  int gapWallHeight = walle[3];
+  int wallTopX = gapWallX;
+  int wallTopY = 0;
+  int wallTopWidth = gapWallWidth;
+  int wallTopHeight = gapWallY;
+  int wallBottomX = gapWallX;
+  int wallBottomY = gapWallY+gapWallHeight;
+  int wallBottomWidth = gapWallWidth;
+  int wallBottomHeight = height-(gapWallY+gapWallHeight);
+  float R = (23);
+  float G = (236);
+  float B = (236);
+  color dcolor = color(R, G, B);
+
+  if (
+    (nbX+(nbT)>wallTopX) &&
+    (nbX-(nbT)<wallTopX+wallTopWidth) &&
+    (nbY+(nbT)>wallTopY) &&
+    (nbY-(nbT)<wallTopY+wallTopHeight)
+    ) {
+      numberC[4]= dcolor;
+      numberC[0] += 80;  
+      place = 0;
+  }
+  else {
+      place = 1;
+      }
+  
+  if (
+    (nbX+(nbT)>wallBottomX) &&
+    (nbX-(nbT)<wallBottomX+wallBottomWidth) &&
+    (nbY+(nbT)>wallBottomY) &&
+    (nbY-(nbT)<wallBottomY+wallBottomHeight)
+    ) {
+      numberC[4]= dcolor;
+      numberC[0] +=80 ;
+      place = 0;
+  }
+  else {
+      place = 1;
+      }
+
+}
+  
+void watchWallCollision(int index) {
+  int[] wall = walls.get(index);
   int gapWallX = wall[0];
   int gapWallY = wall[1];
   int gapWallWidth = wall[2];
@@ -374,42 +453,6 @@ void watchWallCollision(int index) {
     ) {
       gameOver();
   }
-  if (
-    (nbX+(nbT)>wallTopX) &&
-    (nbX<wallTopX+wallTopWidth) &&
-    (nbY+(nbT)>wallTopY) &&
-    (nbY<wallTopY+wallTopHeight)
-    ) {
-      nbX += 50;      
-  }
-  //Collisions chiffre 
-  if (
-    (nbX+(nbT)>wallBottomX) &&
-    (nbX<wallBottomX+wallBottomWidth) &&
-    (nbY+(nbT)>wallBottomY) &&
-    (nbY<wallBottomY+wallBottomHeight)
-    ) {
-      nbX +=50 ;
-  }
+
 
 }
-
-void keepInScreen() {
-
-  if (curseurY+(curseurSize/2) > height) { 
-    curseurY = height-(curseurSize/2);
-  }
-  // curseur hits ceiling
-  if (curseurY-(curseurSize/2) < 0) {
-    curseurY = (curseurSize/2);
-  }
-  // curseur hits left of the screen
-  if (curseurX-(curseurSize/2) < 0) {
-     curseurX = (curseurSize/2);
-  }
-  // curseur hits right of the screen
-  if (curseurX+(curseurSize/2) > width) {
-     curseurX = width-(curseurSize/2);
-  }
-}
-
