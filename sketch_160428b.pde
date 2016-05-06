@@ -246,21 +246,18 @@ void keepNumberInScreen(int index) {
     int[] numberS = numbers.get(index);
     int nbY = numberS[1];
     int nbT = numberS[3];
-    float R = (255);
-    float G = (0);
-    float B = (127);
-    color dcolor = color(R, G, B);
+
     if ((nbY+ nbT) > height) { 
       
       numberS[1] =- round(random(45, 150));
-      numberS[4] = dcolor;
+      
       place = 0;
       }
     
     else if ((nbY - nbT) < 0) {
       
       numberS[1] =+ round(random(45, 150)); 
-      numberS[4] = dcolor;
+      
       place = 0;
       
       }
@@ -289,7 +286,7 @@ void cirlceDrawer(int index) {
       stroke(colors);
       strokeWeight(3);
       ellipseMode(CENTER);
-      ellipse(NumberX, NumberY, curseurSize, curseurSize);}
+      ellipse(NumberX, NumberY, curseurSize, curseurSize);
       fill(ncolors, 900);
       
       textFont(mono);
@@ -298,7 +295,7 @@ void cirlceDrawer(int index) {
       smooth();
       textAlign(CENTER, CENTER);
       text(Width, NumberX, NumberY-1,  Height) ;
-      place = 0;
+      place = 0;}
 
 }
 //Définition de la fonction de déplacement des numéros (Same as wall)
@@ -401,39 +398,56 @@ void watchNumberCollision(int index1, int index2) {
   int wallBottomY = gapWallY+gapWallHeight;
   int wallBottomWidth = gapWallWidth;
   int wallBottomHeight = height-(gapWallY+gapWallHeight);
-  float R = (23);
-  float G = (236);
-  float B = (236);
-  color dcolor = color(R, G, B);
+ 
 
-  if (
+ if (nbX > wallTopX+ (wallTopWidth /2)) {
+    if (
     (nbX+(nbT)>wallTopX) &&
     (nbX-(nbT)<wallTopX+wallTopWidth) &&
     (nbY+(nbT)>wallTopY) &&
     (nbY-(nbT)<wallTopY+wallTopHeight)
     ) {
-      numberC[4]= dcolor;
-      numberC[0] += 80;  
-      place = 0;
+      
+      numberC[0] += 1;  
+    
   }
-  else {
-      place = 1;
-      }
-  
-  if (
+ 
+  else if (
     (nbX+(nbT)>wallBottomX) &&
     (nbX-(nbT)<wallBottomX+wallBottomWidth) &&
     (nbY+(nbT)>wallBottomY) &&
     (nbY-(nbT)<wallBottomY+wallBottomHeight)
     ) {
-      numberC[4]= dcolor;
-      numberC[0] +=80 ;
-      place = 0;
+      
+      numberC[0] +=1 ;
+  
   }
-  else {
-      place = 1;
-      }
 
+ }
+  if (nbX < wallTopX+ (wallTopWidth /2)) {
+    if (
+    (nbX+(nbT)>wallTopX) &&
+    (nbX-(nbT)<wallTopX+wallTopWidth) &&
+    (nbY+(nbT)>wallTopY) &&
+    (nbY-(nbT)<wallTopY+wallTopHeight)
+    ) {
+      
+      numberC[0] -= 1;  
+    
+  }
+ 
+  else if (
+    (nbX+(nbT)>wallBottomX) &&
+    (nbX-(nbT)<wallBottomX+wallBottomWidth) &&
+    (nbY+(nbT)>wallBottomY) &&
+    (nbY-(nbT)<wallBottomY+wallBottomHeight)
+    ) {
+      
+      numberC[0] -=1 ;
+  
+  }
+
+ }
 }
   
 void watchWallCollision(int index) {
