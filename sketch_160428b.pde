@@ -4,10 +4,12 @@ int gameScreen = 0;
 int score = 0;
 float lastInput = 0;
 String mode = "Init";
+String playMode = "numbers";
 int place = 0;
 PFont mono;
 PFont scored;
-
+PFont signp;
+int prise;
 //Définition des variables des murs
 int minGapHeight = 100;
 int maxGapHeight = 200;
@@ -16,13 +18,16 @@ float wallSpeed = 2.0000;
 float lastAddTime = 0;
 float wallsInterval = 6000;
 float lastNumber =0;
+float lastSign =0;
 float numbersInterval = 0;
+float signsInterval = 0;
 //Définition des variables
 color curseurColor = color(150);
 int curseurSize = 40;
 int curseurX, curseurY;
 int curseurVitesse = 40;
-
+String A;
+Float R,G,B;
 //Définition des tableaux
 ArrayList<int[]> walls = new ArrayList<int[]>();
 ArrayList<int[]> numbers = new ArrayList<int[]>();
@@ -30,10 +35,12 @@ ArrayList<int[]> signs = new ArrayList<int[]>();
 
 //Définition de l'affichage général
 void setup() {
+  keyPressed();
   size(853, 480);
   frameRate(60);
   mono = loadFont("Ravie-48.vlw");
   scored = loadFont("KristenITC-Regular-150.vlw");
+  signp = loadFont("LithosPro-Black-48.vlw");
 }
 
 //Boucles du jeu
@@ -49,6 +56,7 @@ void draw() {
 
 //Définition de l'écran d'initialisation
 void initScreen() {
+  
   background(236, 240, 241);
   textAlign(CENTER);
   fill(52, 73, 94);
@@ -64,28 +72,39 @@ void gameScreen() {
   lastInput += 50; 
   wallAdder();
   wallHandler();
-   numberHandler();
+    
+  if (playMode == "signs") {
+     signHandler();
+     signAdder();
+     signCollision(); 
+  }
+  if (playMode == "numbers") {
+    numberHandler();
+    numberCollision();
+    numberAdder();
+  }
+  
   drawCurseur();
-  numberAdder();
- 
   keepInScreen();
-  numberCollision();
+  
 }
 
 void numberVariable() {
     if ((wallSpeed < 5) &&
     (wallsInterval > 3000)) {
+    signsInterval = round(random(3000, 6000));
     numbersInterval = round(random(3000, 6000));
     wallSpeed += 0.000025;
     println(wallSpeed, wallsInterval);
   } else {
     numbersInterval = round(random(2000, 50000));
+    signsInterval = round(random(2000, 50000));
     wallSpeed = 5;
     println(wallSpeed, wallsInterval);
     wallsInterval = round(random(2000, 20000));
   }
   if (wallsInterval > 3000) {
-    wallsInterval -= 0.0025;
+    wallsInterval -= 0.025;
   }
   if (wallsInterval < 3000) {
     wallsInterval -= 0.0000025;}
@@ -128,10 +147,12 @@ public void mousePressed() {
 void startGameS() {
   gameScreen=1;
   mode = "souris";
+  playMode = "numbers";
 }
 //Start mode Clavier
 void startGame() {
   gameScreen=1;
+  playMode = "numbers";
 }
 void gameOver() {
   gameScreen=2;
@@ -144,7 +165,11 @@ void restart() {
   wallsInterval = 6000;
   lastAddTime = 0;
   walls.clear();
+  numbers.clear();
+  signs.clear();
   gameScreen = 1;
+  playMode = "numbers";
+  
 }
 //Restart en mode Souris
 void restartS() {
@@ -154,30 +179,49 @@ void restartS() {
   wallsInterval = 6000;
   lastAddTime = 0;
   walls.clear();
+  signs.clear();
+  numbers.clear();
   gameScreen = 1;
+  prise = 0;
   mode = "souris";
+  playMode = "numbers";
 }
 //Défintion de la fonction de déplacement du curseur
 void mouseMoved(){
   if (mode == "souris") {
-  curseurX = mouseX;
-  curseurY = mouseY;}
+    if (prise == 0) {
+      
+      if (
+    (mouseX > curseurX - (curseurSize / 2)) &&
+    (mouseX < curseurX + (curseurSize / 2)) &&
+    (mouseY > curseurY - (curseurSize / 2)) &&
+    (mouseY < curseurY + (curseurSize / 2))
+    )
+    { 
+      curseurX = mouseX;
+      curseurY = mouseY;
+      prise = 1;} 
+}
+  else if (prise ==1) {
+    curseurX = mouseX;
+      curseurY = mouseY;}
+}
   else if (mode == "clavier") {}
 }
 //Définition du choix de contrôle au clavier
 public void keyPressed(){
    if (gameScreen==0) { 
-    if (keyCode == ENTER){
+    if (keyCode == ' '){
             mode = "clavier";
             curseurY =  height/2;
-            curseurX = width/4;
+            curseurX = width/5;
             startGame();
           }}
           else if (gameScreen==2) {
             if (keyCode == ENTER){
             mode = "clavier";
             curseurY =  height/2;
-            curseurX = width/4;
+            curseurX = width/5;
             restart();
         }
             
@@ -205,6 +249,7 @@ void drawCurseur() {
   smooth();
   noStroke();
   fill(curseurColor);
+  ellipseMode(CENTER);
   ellipse(curseurX, curseurY, curseurSize, curseurSize);
 }
 
@@ -239,6 +284,73 @@ void numberAdder() {
         lastNumber = millis();}
 }
 
+void signAdder() {
+    if (millis()-lastSign > signsInterval) {
+      int randY = round(random(0, height));
+      int signType = round(random(1, 4));
+       
+        if (signType == 1) {
+          R = 162.0;
+          G = 40.0;
+          B = 40.0; }
+        if (signType == 2) {
+          R = 40.0;
+          G = 40.0;
+          B = 162.0;}
+      if (signType == 3){
+          R = 40.0;
+          G = 162.0;
+          B = 40.0;}
+      if (signType == 4){
+          R = 133.0;
+          G = 30.0;
+          B = 157.0;}
+        color roundColors = color(R, G, B);
+        color signColors = color(R, G, B, 500);
+        int[] sign = {width + 10, randY, signType, 40, roundColors, signColors}; 
+        signs.add(sign);
+        lastSign = millis();}
+}
+
+
+          
+void signDrawer(int index) {
+  int[] sign = signs.get(index);
+  int[] signc = signs.get(index);
+  // get gap wall settings 
+  int NumberX = sign[0];
+  int NumberY = sign[1];
+  int sT = sign[2];
+  int Height = sign[3];
+  int colors = sign[4];
+  int ncolors = signc[5];
+  String A = "Signe";
+      if (sT == 1) {
+          A = "-"; }
+      if (sT == 2) {
+          A = "X";}
+      if (sT == 3){
+          A = "+";}
+      if (sT == 4){
+          A = "/";}
+
+      fill(colors, 50);
+      stroke(colors);
+      strokeWeight(3);
+      ellipseMode(CENTER);
+      ellipse(NumberX, NumberY, curseurSize, curseurSize);
+      fill(ncolors, 900);
+      
+      textFont(signp);
+      textAlign(CENTER);
+      textSize(30);
+      smooth();
+      textAlign(CENTER, CENTER);
+      text(A, NumberX, NumberY,  Height) ;
+
+
+}
+
 //Définition de la fonction d'affichage des numeros
  
 void keepNumberInScreen(int index) {
@@ -265,7 +377,30 @@ void keepNumberInScreen(int index) {
     place = 1;} 
   
 }
+void keepSignInScreen(int index) {
+    
+    int[] signS = signs.get(index);
+    int sY = signS[1];
+    int sT = signS[3];
 
+    if ((sY+ sT) > height) { 
+      
+      signS[1] =- round(random(45, 150));
+      
+      place = 0;
+      }
+    
+    else if ((sY - sT) < 0) {
+      
+      signS[1] =+ round(random(45, 150)); 
+      
+      place = 0;
+      
+      }
+    else  {
+    place = 1;} 
+  
+}
 
 
 
@@ -304,25 +439,75 @@ void numberMover(int index) {
   number[0] -= wallSpeed;
 }
 
+void signMover(int index) {
+  int[] sign = signs.get(index);
+  sign[0] -= wallSpeed;
+}
+
 //Définition de la fonction de variation des vitesses et intervalles d'apparition des murs
 
+void signHandler() {
+  for (int i = 0; i < signs.size(); i++) {
+    signMover(i);
+    numberVariable();
+    signDrawer(i);
+    signCursorCollision(i);
+    keepSignInScreen(i);
+  }
+}
 
 void numberHandler() {
   for (int i = 0; i < numbers.size(); i++) {
     numberMover(i);
-
     numberVariable();
     cirlceDrawer(i);
+    numberCursorCollision(i);
     keepNumberInScreen(i);
 
   }
 }
 void numberCollision() {
-  for (int i1 = 0; i1 < numbers.size(); i1++) {
-    for (int i2 = 0; i2 < walls.size(); i2++) {
-    watchNumberCollision(i2, i1);}}
+
+     for (int i1 = 0; i1 < numbers.size(); i1++) {
+      for (int i2 = 0; i2  < walls.size(); i2++) {
+           watchNumberCollision(i2, i1);}}}
+           
+void signCollision() {
+   for (int i3 = 0; i3 < signs.size(); i3++) {
+      for (int i2 = 0; i2  < walls.size(); i2++) {
+           watchSignCollision(i2, i3);}}}
+    
+void signCursorCollision(int index) {
+    int[] signC = signs.get(index);
+    int sX =  signC[0];
+    int sY = signC[1];
+    int sT = signC[3];
+  
+    if (
+    (curseurX+(curseurSize/2)>sX - (sT /2)) &&
+    (curseurX-(curseurSize/2)<sX+(sT/2)) &&
+    (curseurY+(curseurSize/2)>sY - (sT /2)) &&
+    (curseurY-(curseurSize/2)<sY+(sT/2 ))
+    ) {
+      gameOver();      
+  }
   
 }
+void numberCursorCollision(int index) {
+    int[] numberC = numbers.get(index);
+    int nbX =  numberC[0];
+    int nbY = numberC[1];
+    int nbT = numberC[3];
+   if (
+    (curseurX+(curseurSize/2)>nbX - (nbT /2)) &&
+    (curseurX-(curseurSize/2)<nbX+(nbT/2)) &&
+    (curseurY+(curseurSize/2)>nbY - (nbT /2)) &&
+    (curseurY-(curseurSize/2)<nbY+(nbT/2 ))
+    ) {
+      gameOver();      
+  }
+}
+
 //Définition de la fonction de contrôle des murs
 void wallHandler() {
   for (int i = 0; i < walls.size(); i++) {
@@ -379,6 +564,7 @@ void keepInScreen() {
      curseurX = width-(curseurSize/2);
   }
 }
+
 void watchNumberCollision(int index1, int index2) {
   int[] walle = walls.get(index1);
   int[] numberC = numbers.get(index2);
@@ -398,9 +584,8 @@ void watchNumberCollision(int index1, int index2) {
   int wallBottomY = gapWallY+gapWallHeight;
   int wallBottomWidth = gapWallWidth;
   int wallBottomHeight = height-(gapWallY+gapWallHeight);
- 
 
- if (nbX > wallTopX+ (wallTopWidth /2)) {
+ if (nbX >= wallTopX+ (wallTopWidth /2)) {
     if (
     (nbX+(nbT)>wallTopX) &&
     (nbX-(nbT)<wallTopX+wallTopWidth) &&
@@ -443,13 +628,77 @@ void watchNumberCollision(int index1, int index2) {
     (nbY-(nbT)<wallBottomY+wallBottomHeight)
     ) {
       
-      numberC[0] -=1 ;
+      numberC[0] -=1 ;  }
+ }
+}
+void watchSignCollision(int index1, int index3) {
+  int[] walle = walls.get(index1);
+  int[] signC = signs.get(index3);
+  // get gap wall settings 
+  int sX =  signC[0];
+  int sY = signC[1];
+  int sT = signC[3];
+  int gapWallX = walle[0];
+  int gapWallY = walle[1];
+  int gapWallWidth = walle[2];
+  int gapWallHeight = walle[3];
+  int wallTopX = gapWallX;
+  int wallTopY = 0;
+  int wallTopWidth = gapWallWidth;
+  int wallTopHeight = gapWallY;
+  int wallBottomX = gapWallX;
+  int wallBottomY = gapWallY+gapWallHeight;
+  int wallBottomWidth = gapWallWidth;
+  int wallBottomHeight = height-(gapWallY+gapWallHeight);
+ if (sX >= wallTopX+ (wallTopWidth /2)) {
+    if (
+    (sX+(sT)>wallTopX) &&
+    (sX-(sT)<wallTopX+wallTopWidth) &&
+    (sY+(sT)>wallTopY) &&
+    (sY-(sT)<wallTopY+wallTopHeight)
+    ) {
+      
+      signC[0] += 1;  
+    
+  }
+ 
+  else if (
+    (sX+(sT)>wallBottomX) &&
+    (sX-(sT)<wallBottomX+wallBottomWidth) &&
+    (sY+(sT)>wallBottomY) &&
+    (sY-(sT)<wallBottomY+wallBottomHeight)
+    ) {
+      
+      signC[0] +=1 ;
+  
+  }
+
+ }
+  if (sX < wallTopX+ (wallTopWidth /2)) {
+    if (
+    (sX+(sT)>wallTopX) &&
+    (sX-(sT)<wallTopX+wallTopWidth) &&
+    (sY+(sT)>wallTopY) &&
+    (sY-(sT)<wallTopY+wallTopHeight)
+    ) {
+      
+      signC[0] -= 1;  
+    
+  }
+ 
+  else if (
+    (sX+(sT)>wallBottomX) &&
+    (sX-(sT)<wallBottomX+wallBottomWidth) &&
+    (sY+(sT)>wallBottomY) &&
+    (sY-(sT)<wallBottomY+wallBottomHeight)
+    ) {
+      
+      signC[0] -=1 ;
   
   }
 
  }
 }
-  
 void watchWallCollision(int index) {
   int[] wall = walls.get(index);
   int gapWallX = wall[0];
