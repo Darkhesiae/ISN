@@ -12,6 +12,7 @@ PFont signp;
 int c;
 float  Timer = 0.00;
 float lastTimer = 0.00;
+float lastTimerN = 0.00;
 int pos = 0;
 int Cv1 =0;
 int Cv2 = 0;
@@ -22,7 +23,8 @@ int signType;
 int Lr = 0;
 int Lb = 0;
 int Lg = 0;
-int prise, ScoreT;
+int prise; 
+int ScoreT = 0;
 //Définition des variables des murs
 int minGapHeight = 100;
 int maxGapHeight = 200;
@@ -101,7 +103,12 @@ void gameScreen() {
   smooth();
   textFont(signp);
   if ((ScoreT < 9999) && (ScoreT  > - 9999)){ pos = width/10; }
-  if (ScoreT  > 999999)  {pos = width/9;} 
+  else if (ScoreT  > 999999)  {pos = width/5;} 
+  else if (ScoreT  < -999999)  {pos = width/5;} 
+  else if (ScoreT  > 9999999)  {pos = width/4;} 
+  else if (ScoreT  < -9999999)  {pos = width/4;} 
+  else if (ScoreT  > 99999999)  {pos = width/3;} 
+  else if (ScoreT  < -99999999)  {pos = width/3;} 
   else {pos = width/7;}
   
   text(ScoreT, pos, height/20);
@@ -121,9 +128,24 @@ void gameScreen() {
     smooth();
     textFont(signp);
     text(Timer, width - width/7, height/20);
-    if (Timer < 0.01) {gameOver();}
+    if (Timer < 0.01) {gameOver();
+    }
+    lastTimerN = millis();
   }
   if (playMode == "numbers") {
+    if (signe == 1) {
+      if((S == 2)   
+|| (S== 4)){
+    Timer = 10 - ((millis() - lastTimerN)/1000);
+    if ((Timer < 10) && (Timer  > 6)){ c = color(#54CB83); }
+    if ((Timer < 6) && (Timer  > 3)){ c = color(#FF850A); }
+    if ((Timer < 3) && (Timer  > 0)){ c = color(#FF3131); }
+    if (Timer < 0.01) {gameOver();}
+    textSize(20);
+    fill(c);
+    smooth();
+    textFont(signp);
+    text(Timer, width - width/7, height/20);}}
     numberHandler();
     numberCollision();
     numberAdder();
@@ -135,24 +157,23 @@ void gameScreen() {
 }
 
 void numberVariable() {
-  if ((wallSpeed < 5) &&
-    (wallsInterval > 3000)) {
-    signsInterval = round(random(3000, 6000));
-    numbersInterval = round(random(3000, 6000));
-    wallSpeed += 0.000025;
+  if ((wallSpeed < 6) &&
+    (wallsInterval > 1000)) {
+    signsInterval = round(random(2000, 4500));
+    numbersInterval = round(random(2000, 4500));
+    wallSpeed += 0.00025;
     println(wallSpeed, wallsInterval);
   } else {
-    numbersInterval = round(random(2000, 50000));
-    signsInterval = round(random(2000, 50000));
+
     wallSpeed = 5;
     println(wallSpeed, wallsInterval);
-    wallsInterval = round(random(2000, 20000));
+    wallsInterval = round(random(1000, 5000));
   }
   if (wallsInterval > 3000) {
-    wallsInterval -= 0.025;
+    wallsInterval -= 0.25;
   }
   if (wallsInterval < 3000) {
-    wallsInterval -= 0.0000025;
+    wallsInterval -= 0.25;
   }
 }
 
@@ -206,6 +227,7 @@ void gameOver() {
 void restart() {
   Timer = 0.00;
   lastTimer = 0.00;
+  lastTimerN = 0.00;
   ScoreT = 0;
   wallSpeed = 2;
   lastAddTime = 0;
@@ -223,6 +245,7 @@ void restart() {
 void restartS() {
   Timer = 0.00;
   lastTimer = 0.00;
+  lastTimerN = 0.00;
   ScoreT = 0;
   wallSpeed = 2;
   lastAddTime = 0;
@@ -329,7 +352,7 @@ void wallAdder() {
 void numberAdder() {
   if (millis()-lastNumber > numbersInterval) {
     int randY = round(random(0, height));
-    int scoreN = round(random(0, 9));
+    int scoreN = round(random(-9, 9));
     float R = random(200);
     float G = random (200);
     float B = random (200);
@@ -495,6 +518,7 @@ void signDrawer(int index) {
       println(R);
     }
   }
+  tint(0,0,0, 40);
   ncolors = color (R, G, B);
   colors = color (R, G, B);
   fill(colors, 50);
@@ -667,6 +691,7 @@ void numberCursorCollision(int index) {
   int nbY = numberC[1];
   int nbT = numberC[3];
   int Score = numberC[2];
+  
 
   if (
     (curseurX+(curseurSize/2)>nbX - (nbT /2)) &&
