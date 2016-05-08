@@ -1,5 +1,9 @@
-
+import processing.video.*;
+import processing.sound.*;
 //Défintion des variables de contrôle
+Movie theMov;
+SoundFile music;
+SoundFile bruh;
 int gameScreen = 0;
 int score = 0;
 float lastInput = 0;
@@ -9,7 +13,11 @@ int place = 0;
 PFont mono;
 PFont scored;
 PFont signp;
+PImage bg;
+int Bruh = 0;
 int c;
+int Music =0;
+int Divide0 = 0;
 float  Timer = 0.00;
 float lastTimer = 0.00;
 float lastTimerN = 0.00;
@@ -21,9 +29,11 @@ int Cg = 0;
 int Cb = 0;
 int signType;
 int Lr = 0;
+String TextScore;
 int Lb = 0;
 int Lg = 0;
 int prise; 
+
 int ScoreT = 0;
 //Définition des variables des murs
 int minGapHeight = 100;
@@ -42,6 +52,7 @@ int curseurSize = 40;
 int curseurX, curseurY;
 int curseurVitesse = 40;
 String A;
+int HighScore = 0;
 Float R, G, B;
 int S;
 int signe = 1;
@@ -53,11 +64,17 @@ ArrayList<int[]> signs = new ArrayList<int[]>();
 //Définition de l'affichage général
 void setup() {
   keyPressed();
-  size(853, 480);
+  size(852, 480);
   frameRate(60);
-  mono = loadFont("Ravie-48.vlw");
+  mono = loadFont("KristenITC-Regular-150.vlw");
   scored = loadFont("KristenITC-Regular-150.vlw");
   signp = loadFont("LithosPro-Black-48.vlw");
+  bg = loadImage("13-blast-damage_1218012i.jpg");
+  music = new SoundFile(this, "music.mp3");
+  bruh = new SoundFile(this, "bruh.wav");
+  theMov = new Movie(this, "Composition 1.mp4");
+  theMov.play();  
+  theMov.loop();  
 }
 
 //Boucles du jeu
@@ -65,9 +82,10 @@ void draw() {
   if (gameScreen == 0) {
     initScreen();
   } else if (gameScreen == 1) {
-    gameScreen();
-  } else if (gameScreen == 2) { 
+    gameScreen();}
+    else if (gameScreen == 2) { 
     gameOverScreen();
+      
   }
 }
 
@@ -82,11 +100,18 @@ void initScreen() {
   textSize(15); 
   text("Click to Math", width/2, height-30);
 }
-
+void movieEvent(Movie m) { 
+  m.read(); 
+} 
 //Définition de l'écran de jeu et emploi des fonctions définies plus bas
 void gameScreen() {
-  background(236, 240, 241);
-  lastInput += 50; 
+ background(theMov);
+  if (Music == 0){music.play();
+    
+    Music = 1;}
+  //background(236, 240, 241);
+   lastInput += 50; 
+   music.amp(0.2);
   wallAdder();
   wallHandler();
   if (ScoreT == 0) {
@@ -179,18 +204,35 @@ void numberVariable() {
 
 //Définition de l'écran de Game Over
 void gameOverScreen() {
-
+  if (Bruh == 0) {bruh.play();
+  music.stop();
+  Bruh = 1;}
   background(44, 62, 80);
   textFont(scored);
   textAlign(CENTER);
   fill(236, 240, 241);
+  if (Divide0 == 1)
+  {TextScore = "Vous ne pouvez pas diviser par "; 
   textSize(24);
-  text("Your Score", width/2, height/2 - 120);
+  text("L'auriez vous oublié ?", width/2, height - 80);}
+  else {TextScore = "Your Score";}
+  textSize(24);
+  
+  text(TextScore, width/2, height/2 - 120);
   textSize(130);
   smooth();
+  ScoreT = abs(ScoreT);
   text(ScoreT, width/2, height/2);
+  if (ScoreT >= HighScore) {
+    HighScore = ScoreT;
+    textSize(25);
+    text("Nouveau Record", width/2, height-110);
+  }
   textSize(25);
-  text("Click to Restart", width/2, height-30);
+  
+  text("Record :"+ HighScore, width/2, height-70);
+  textSize(25);
+  text("Cliquez pour recommencer", width/2, height-30);
 }
 //Définition des instructions en fonction de l'écran si on clique
 public void mousePressed() { 
@@ -226,6 +268,7 @@ void gameOver() {
 //Restart en mode Clavier
 void restart() {
   Timer = 0.00;
+  Divide0 =0;
   lastTimer = 0.00;
   lastTimerN = 0.00;
   ScoreT = 0;
@@ -239,12 +282,17 @@ void restart() {
   gameScreen = 1;
   playMode = "numbers";
   S= 0;
+  Bruh = 0;
+  Music = 0;
   signe = 1;
 }
 //Restart en mode Souris
 void restartS() {
   Timer = 0.00;
+    Bruh = 0;
+  Music = 0;
   lastTimer = 0.00;
+  Divide0 = 0;
   lastTimerN = 0.00;
   ScoreT = 0;
   wallSpeed = 2;
@@ -287,7 +335,7 @@ void mouseMoved() {
 //Définition du choix de contrôle au clavier
 public void keyPressed() {
   if (gameScreen==0) { 
-    if (keyCode == ' ') {
+    if (keyCode == ENTER) {
       mode = "clavier";
       curseurY =  height/2;
       curseurX = width/5;
@@ -303,7 +351,7 @@ public void keyPressed() {
   }
   //Définition des contrôles au clavier 
   if (mode == "clavier") {
-    if (lastInput > 300) {
+    if (lastInput > 100) {
       if (keyCode == DOWN) {
         curseurY += curseurVitesse;
         lastInput = 0;
@@ -707,8 +755,13 @@ void numberCursorCollision(int index) {
       } else if (S == 3) {
         ScoreT = ScoreT +  Score ;
       } else if (S == 4) {
-        ScoreT = ScoreT /  Score ;
-      } else {
+        if (Score == 0){
+          ScoreT = 0;
+          Divide0 = 1;
+          gameOver();}
+        else {ScoreT = ScoreT /  Score ;}
+      } 
+        else {
         ScoreT = Score;
       } 
       signe = 0;
