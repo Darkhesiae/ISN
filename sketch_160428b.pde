@@ -1,7 +1,8 @@
 import processing.video.*;
 import processing.sound.*;
 //Défintion des variables de contrôle
-Movie theMov;
+Movie PLUS;
+Movie MOINS;
 SoundFile music;
 SoundFile bruh;
 int gameScreen = 0;
@@ -16,11 +17,14 @@ PFont signp;
 PImage bg;
 int Bruh = 0;
 int c;
+int T;
+int c2;
 int Music =0;
 int Divide0 = 0;
 float  Timer = 0.00;
 float lastTimer = 0.00;
 float lastTimerN = 0.00;
+float lastTimerS = 0.00;
 int pos = 0;
 int Cv1 =0;
 int Cv2 = 0;
@@ -33,7 +37,8 @@ String TextScore;
 int Lb = 0;
 int Lg = 0;
 int prise; 
-
+int Bck = 0;
+int Bckm = 0;
 int ScoreT = 0;
 //Définition des variables des murs
 int minGapHeight = 100;
@@ -56,6 +61,7 @@ int HighScore = 0;
 Float R, G, B;
 int S;
 int signe = 1;
+int W, H;
 //Définition des tableaux
 ArrayList<int[]> walls = new ArrayList<int[]>();
 ArrayList<int[]> numbers = new ArrayList<int[]>();
@@ -64,6 +70,7 @@ ArrayList<int[]> signs = new ArrayList<int[]>();
 //Définition de l'affichage général
 void setup() {
   keyPressed();
+
   size(852, 480);
   frameRate(60);
   mono = loadFont("KristenITC-Regular-150.vlw");
@@ -72,9 +79,18 @@ void setup() {
   bg = loadImage("13-blast-damage_1218012i.jpg");
   music = new SoundFile(this, "music.mp3");
   bruh = new SoundFile(this, "bruh.wav");
-  theMov = new Movie(this, "Composition 1.mp4");
-  theMov.play();  
-  theMov.loop();  
+  PLUS = new Movie(this, "PLUS.mp4");
+  image(PLUS, 0,0, 853, 480);
+     PLUS.width = 852;
+   PLUS.height = 480;
+  MOINS = new Movie(this, "MOINS.mp4");
+       MOINS.width = 852;
+   MOINS.height = 480;
+   PLUS.play(); 
+   PLUS.loop(); 
+   MOINS.play();      
+    MOINS.loop(); 
+
 }
 
 //Boucles du jeu
@@ -103,17 +119,19 @@ void initScreen() {
 void movieEvent(Movie m) { 
   m.read(); 
 } 
-//Définition de l'écran de jeu et emploi des fonctions définies plus bas
-void gameScreen() {
- background(theMov);
-  if (Music == 0){music.play();
-    
-    Music = 1;}
-  //background(236, 240, 241);
-   lastInput += 50; 
-   music.amp(0.2);
-  wallAdder();
-  wallHandler();
+void background(){
+  if (ScoreT > 0) {background(PLUS);
+    if (Bck == 0){
+      Bck = 1;
+      Bckm = 0;}}
+   else if (ScoreT < 0) {background(MOINS);
+    if (Bckm == 0){
+      Bckm = 1;
+      Bck = 0;}}
+  else background(236, 240, 241);
+}
+
+void affichageScore() {
   if (ScoreT == 0) {
     c = color(#3EDB69);
   }
@@ -137,46 +155,59 @@ void gameScreen() {
   else {pos = width/7;}
   
   text(ScoreT, pos, height/20);
-  if (playMode == "signs") {
-    signHandler();
-    signAdder();
-    signCollision();
-    signRemoving();
-    Timer = 15 - ((millis() - lastTimer)/1000);
-    if ((Timer < 15) && (Timer  > 10)){ c = color(#54CB83); }
-    if ((Timer < 10) && (Timer  > 6)){ c = color(#C7D349); }
+}
+void timer() {
+    Timer = T - ((millis() - lastTimer)/1000);
+    if (T == 15) {if ((Timer < 15) && (Timer  > 10)){ c = color(#54CB83);
+               c2 = color(#C7D349);}}
+    else {c2 = color(#54CB83); }
+    if ((Timer < 10) && (Timer  > 6)){ c = color(c2); }
     if ((Timer < 6) && (Timer  > 3)){ c = color(#FF850A); }
     if ((Timer < 3) && (Timer  > 0)){ c = color(#FF3131); }
-    
     textSize(20);
     fill(c);
     smooth();
     textFont(signp);
     text(Timer, width - width/7, height/20);
-    if (Timer < 0.01) {gameOver();
+        if (Timer < 0.01) {gameOver();
     }
+    
+}
+//Définition de l'écran de jeu et emploi des fonctions définies plus bas
+void gameScreen() {
+  background();
+  if (Music == 0){music.play();
+    
+    Music = 1;}
+  //background(236, 240, 241);
+   lastInput += 50; 
+   music.amp(0.2);
+  wallAdder();
+  wallHandler();
+  affichageScore();
+  if (playMode == "signs") {
+    signHandler();
+    signAdder();
+    signCollision();
+    signRemoving();
+    T= 15;
+    timer();
+    lastTimer = lastTimerS;
     lastTimerN = millis();
   }
   if (playMode == "numbers") {
     if (signe == 1) {
       if((S == 2)   
-|| (S== 4)){
-    Timer = 10 - ((millis() - lastTimerN)/1000);
-    if ((Timer < 10) && (Timer  > 6)){ c = color(#54CB83); }
-    if ((Timer < 6) && (Timer  > 3)){ c = color(#FF850A); }
-    if ((Timer < 3) && (Timer  > 0)){ c = color(#FF3131); }
-    if (Timer < 0.01) {gameOver();}
-    textSize(20);
-    fill(c);
-    smooth();
-    textFont(signp);
-    text(Timer, width - width/7, height/20);}}
+          || (S== 4)){
+            T= 10;
+            timer();
+            lastTimer = lastTimerN;
+    }}
     numberHandler();
     numberCollision();
     numberAdder();
-    lastTimer = millis();
+    lastTimerS = millis();
   }
-
   drawCurseur();
   keepInScreen();
 }
