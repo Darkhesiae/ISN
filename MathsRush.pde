@@ -1,6 +1,6 @@
-import processing.video.*; //<>// //<>//
+import processing.video.*;
 import processing.sound.*;
-//Défintion des variables de contrôle
+//Défintion des variables
 //Création des slots pour sons et vidéos
 Movie PLUS; 
 Movie MOINS;
@@ -67,32 +67,31 @@ ArrayList<int[]> walls = new ArrayList<int[]>();
 ArrayList<int[]> numbers = new ArrayList<int[]>();
 ArrayList<int[]> signs = new ArrayList<int[]>();
 
-//Définition de l'affichage général
+//Définition des constantes d'affichage et chargement des fichiers
 void setup() {
   size(852, 480, JAVA2D);
   smooth(2);
   frameRate(60);
+  //Chargement des polices d'écriture
   mono = loadFont("KristenITC-Regular-150.vlw");
   scored = loadFont("Code-Pro-40.vlw");
   signp = loadFont("LithosPro-Black-48.vlw");
   CODE = loadFont("Code-Pro-255.vlw");
   CODElc =  loadFont("Code-Pro-LC-50.vlw");
   CODEpetit = loadFont("Code-Pro-15.vlw");
+  //Chargement des fichiers audios
   music = new SoundFile(this, "music.mp3");
   bruh = new SoundFile(this, "bruh.wav");
+  //Chargement et définition des propriétés des fichiers vidéos du fond
   PLUS = new Movie(this, "PLUS.mp4");
-  PLUS.width = 852; 
-  PLUS.height = 480;
+  PLUS.width = 852;     PLUS.height = 480;
   MOINS = new Movie(this, "MOINS.mp4");
-  MOINS.width = 852; 
-  MOINS.height = 480;
-  PLUS.play();  
-  PLUS.loop(); 
-  MOINS.play(); 
-  MOINS.loop();
+  MOINS.width = 852;      MOINS.height = 480;
+  PLUS.play();      PLUS.loop(); 
+  MOINS.play();     MOINS.loop();
 }
 
-//Boucles du jeu
+//Boucles du jeu ou Update
 void draw() {
   if (gameScreen == 0) {
     initScreen();
@@ -112,7 +111,7 @@ void draw() {
   }
 }
 
-//Définition de l'écran d'initialisation
+//Définition de l'écran d'initialisation avec les instructions
 void initScreen() { 
   background(236, 240, 241);
   textAlign(CENTER);
@@ -133,12 +132,10 @@ void initScreen() {
   text("X / - +", width/2.2, height/2.40);
   textFont(CODEpetit);
   textSize(15); 
-  if (xselect < width/2) 
-  {
+  if (xselect < width/2){
     xselect +=40;
   } else {
-    xselect = width/2;
-  }
+    xselect = width/2;  }
   text("Sélectionnez votre mode de jeu avec les flèches directionnelles", xselect, height-100); //Instructions
   noStroke();
   fill(#D5E3E0);
@@ -155,6 +152,7 @@ void initScreen() {
   {
     yselect -=10;
   }
+  //Choix du mode de contrôles soit souris ou clavier
   if (mode == "Souris") {
     text("Cliquez pour commencer", width/2, yselect);
   } else if (mode == "Clavier") {
