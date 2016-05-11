@@ -305,11 +305,11 @@ void numberVariable() {
 //Mise à jour de "Record" dans un .dat
 void updateHighscore() {
   String[] HScore = {str(HighScore)};
-  saveStrings("highscore.dat", HScore);
+  saveStrings("data/highscore.txt", HScore);
 }
 //Recherche du record dans le .dat
 void loadHighscore() {
-  String hscore[] = loadStrings("highscore.dat");
+  String hscore[] = loadStrings("highscore.txt");
   for (int j = 0; j < hscore.length; j++) {
     HighScore = int(hscore[j]);
   }
