@@ -1,4 +1,4 @@
-import processing.video.*; //<>// //<>//
+import processing.video.*; //<>//
 import processing.sound.*;
 //Défintion des variables de contrôle
 //Création des slots pour sons et vidéos
@@ -86,9 +86,7 @@ void setup() {
   MOINS = new Movie(this, "MOINS.mp4");
   MOINS.width = 852; 
   MOINS.height = 480;
-  PLUS.play();  
   PLUS.loop(); 
-  MOINS.play(); 
   MOINS.loop();
 }
 
@@ -192,9 +190,10 @@ void affichageScore() {
   if (ScoreT < 0) {
     c = color(#274BAA);
   }
-  textSize(20);
+  
   fill(c);
   textFont(signp);
+  
   text(ScoreT, PosScore, height/20);
   if ((ScoreT < 9999) && (ScoreT  > - 9999)) { 
     PosScore = width/10;
@@ -214,7 +213,7 @@ void gameScreen() {
   background();
   if (prise == 1) { //Musique
     if (Music == 0) {
-      music.play();
+      music.loop();    
       Music = 1;
     }
     music.amp(0.2);
@@ -318,7 +317,9 @@ void loadHighscore() {
 //Définition de l'écran de Game Over
 void gameOverScreen() {
   if (Bruh == 0) {
+    bruh.amp(0.5);
     bruh.play();
+    
     music.stop();
     Bruh = 1;
   }
@@ -392,8 +393,9 @@ void mousePressed() {
         (mouseY < 46))
         {gameScreen = 0; restart(); }
       else {
+      if (mode == "Souris"){
       restart = true;
-      restart();}
+      restart();}}
     }
   
 }
@@ -404,13 +406,12 @@ void startGame() {
   playMode = "numbers";
   gameScreen=1;
 }
-
 void gameOver() {
   gameScreen=2;
 }
-
 void restart() {
   Timer = 0.00;
+  xselect = - 400; yselect = 600;
   Divide0 =0;
   lastTimerS = 0.00;
   lastTimerN = 0.00;
